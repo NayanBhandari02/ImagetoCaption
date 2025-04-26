@@ -5,8 +5,24 @@ import numpy as np
 from PIL import Image
 import pickle
 
-# ---- Load the model and tokenizer ----
-model = load_model('Inception_final.keras')  # Path to your trained CNN+LSTM model
+import requests
+import tempfile
+
+# --- Download from Google Drive
+def download_model_from_drive(url):
+    file_id = url.split('/d/')[1].split('/')[0]
+    download_url = f"https://drive.google.com/uc?id={file_id}"
+
+    response = requests.get(download_url)
+    temp = tempfile.NamedTemporaryFile(delete=False)
+    temp.write(response.content)
+    temp.flush()
+    return temp.name
+
+# Load model from Google Drive
+gdrive_link = 'https://drive.google.com/file/d/1I4C3rybLNS_-Igt0ygh8d55QZFeR2sdY/view?usp=sharing'
+model_path = download_model_from_drive(gdrive_link)
+model = load_model(model_path)  # Path to your trained CNN+LSTM model
 with open('tokenizer_final.pkl', 'rb') as handle:  # Path to your saved tokenizer
     tokenizer = pickle.load(handle)
 
